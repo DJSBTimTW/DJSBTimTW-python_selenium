@@ -59,19 +59,34 @@ class Application(tk.Tk):
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-        menubar = frame.menubar(self)
-        self.configure(menu=menubar)
+        menubar = tk.Menu(self)
+        if role == "login":
+            topmenu = tk.Menu(menubar)
+            self.configure(menu=topmenu)
+        elif role == "admin":
+            topmenu = tk.Menu(menubar)
+            topmenu.add_cascade(label="1.BMI計算",command=partial(self.show_frame("admin",bmipage)))
+            topmenu.add_cascade(label="2.最佳體重計算")
+            topmenu.add_cascade(label="3.觀看log")
+            topmenu.add_cascade(label="4.離開")
+            self.configure(menu=topmenu)
+        elif role == "user":
+            topmenu = tk.Menu(menubar)
+            topmenu.add_cascade(label="1.BMI計算",command=partial(self.show_frame("user",bmipage)))
+            topmenu.add_cascade(label="2.最佳體重計算")
+            topmenu.add_cascade(label="3.離開")
+            self.configure(menu=topmenu)
 
     def login(self, name,pwd):
         strname = name.get()
         strpwd = pwd.get()
-        lre = tf.login(strname,strpwd)
+        lre = tf.login(str(strname).strip(),str(strpwd).strip())
         if lre == "admin":
             tkinter.messagebox.showinfo('提示','登入成功')
-            self.show_frame(adminpage)
+            self.show_frame("admin",adminpage)
         elif lre == "user":
             tkinter.messagebox.showinfo('提示','登入成功')
-            self.show_frame(userpage)
+            self.show_frame("user",userpage)
         elif lre == "accno":
             tkinter.messagebox.showerror('提示','帳號錯誤')
             tf.entryclear(name)
@@ -90,7 +105,7 @@ class loginPage(tk.Frame):
         entry1 = tk.Entry(self, show=None)
         entry2 = tk.Entry(self, show='*')
         label1 = tk.Label(self, text="帳號:").grid(row='1',column='0',pady=20)
-        label2 = tk.Label(self, text="帳號:").grid(row='2',column='0',pady=20)
+        label2 = tk.Label(self, text="密碼:").grid(row='2',column='0',pady=20)
         entry1.grid(row='1',column='1',columnspan=3,pady=20)
         entry2.grid(row='2',column='1',columnspan=3,pady=20)
 
@@ -99,12 +114,6 @@ class loginPage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        return menubar
-
-
-
 class adminpage(tk.Frame):
     # admin
     def __init__(self, parent, root):
@@ -112,16 +121,11 @@ class adminpage(tk.Frame):
         label = tk.Label(self, text="admin")
         label.pack(pady=10,padx=10)
 
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        menubar.add_cascade(label="1.BMI計算")
-        menubar.add_cascade(label="2.最佳體重計算")
-        menubar.add_cascade(label="3.觀看log")
-        menubar.add_cascade(label="4.離開")
-        return menubar
-
-
-
+class bmipage(tk.Frame):
+    def __init__(self, parent, root):
+        super().__init__(parent)
+        label = tk.Label(self, text="bmi")
+        label.pack(pady=10,padx=10)
 
 class userpage(tk.Frame):
     # user
@@ -129,15 +133,6 @@ class userpage(tk.Frame):
         super().__init__(parent)
         label = tk.Label(self, text="user")
         label.pack(pady=10,padx=10)
-
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        menubar.add_cascade(label="1.BMI計算")
-        menubar.add_cascade(label="2.最佳體重計算")
-        menubar.add_cascade(label="3.離開")
-        return menubar
-
-
 
 if __name__ == '__main__':
     app = Application()
