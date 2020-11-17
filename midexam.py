@@ -147,10 +147,13 @@ class loginpage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
+<<<<<<< HEAD
     def menubar(salf, root):
         menubar = tk.Menu(root)
         return menubar
 
+=======
+>>>>>>> origin/master
 class adminpage(tk.Frame):
     # admin
     def __init__(self, parent, root):
@@ -158,6 +161,15 @@ class adminpage(tk.Frame):
         label = tk.Label(self, text="admin")
         label.pack(pady=10,padx=10)
 
+<<<<<<< HEAD
+=======
+class bmipage(tk.Frame):
+    def __init__(self, parent, root):
+        super().__init__(parent)
+        label = tk.Label(self, text="bmi")
+        label.pack(pady=10,padx=10)
+
+>>>>>>> origin/master
 class userpage(tk.Frame):
     # user
     def __init__(self, parent, root):
@@ -165,6 +177,7 @@ class userpage(tk.Frame):
         label = tk.Label(self, text="user")
         label.pack(pady=10,padx=10)
 
+<<<<<<< HEAD
 class bmipage(tk.Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
@@ -181,6 +194,8 @@ class bmipage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
+=======
+>>>>>>> origin/master
 if __name__ == '__main__':
     app = Application()
     app.mainloop()
