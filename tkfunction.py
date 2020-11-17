@@ -34,6 +34,11 @@ def bmicount(height,weight):
     bmi = (weight/(height*height))
     return bmi
 
+def wecount(height):
+    height = float(height)
+    weight = (int(22)*(height*height))
+    return weight
+
 def getentry(e):
     o = str(e.get()).strip()
     return o

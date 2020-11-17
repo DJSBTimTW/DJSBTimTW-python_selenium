@@ -1,4 +1,4 @@
-import sqlite3,csv
+import sqlite3,csv,datetime
 import tkinter as tk
 import tkfunction as tf
 from tkinter import ttk
@@ -51,7 +51,7 @@ class Application(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (loginpage, adminpage, userpage, bmipage):
+        for F in (loginpage, adminpage, userpage, bmipage, bestwepage):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -67,14 +67,14 @@ class Application(tk.Tk):
         elif loginrole == "admin":
             menubar = tk.Menu(self)
             menubar.add_command(label="1.BMI計算",command=lambda: self.showbmipage(0))
-            menubar.add_command(label="2.最佳體重計算")
-            menubar.add_command(label="3.觀看log")
+            menubar.add_command(label="2.最佳體重計算",command=lambda: self.showbestwepage(0))
+            menubar.add_command(label="3.觀看log",command=lambda: self.showlogpage(0))
             menubar.add_command(label="4.離開",command=lambda: self.acclogout(0))
             self.configure(menu=menubar)
         elif loginrole == "user":
             menubar = tk.Menu(self)
             menubar.add_command(label="1.BMI計算",command=lambda: self.showbmipage(0))
-            menubar.add_command(label="2.最佳體重計算")
+            menubar.add_command(label="2.最佳體重計算",command=lambda: self.showbestwepage(0))
             menubar.add_command(label="3.離開",command=lambda: self.acclogout(0))
             self.configure(menu=menubar)
         # menubar = frame.menubar(self)
@@ -128,8 +128,24 @@ class Application(tk.Tk):
             tkinter.messagebox.showerror('提示','輸入錯誤')
             tf.twoclear(he,we)
 
+    def bestwe(self,he):
+        hei = tf.getentry(he)
+        if hei !="":
+            we = tf.wecount(hei)
+            tkinter.messagebox.showinfo('計算結果','最佳體重為:{}'.format(we))
+            tf.entryclear(he)
+        else:
+            tkinter.messagebox.showerror('提示','輸入錯誤')
+            tf.entryclear(he)
+
     def showbmipage(self,n):
         self.show_frame(bmipage)
+
+    def showbestwepage(self,n):
+        self.show_frame(bestwepage)
+
+    def showlogpage(self,n):
+        self.show_frame(logpage)
 
 class loginpage(tk.Frame):
     def __init__(self, parent, root):
@@ -147,29 +163,6 @@ class loginpage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
-<<<<<<< HEAD
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        return menubar
-
-=======
->>>>>>> origin/master
-class adminpage(tk.Frame):
-    # admin
-    def __init__(self, parent, root):
-        super().__init__(parent)
-        label = tk.Label(self, text="admin")
-        label.pack(pady=10,padx=10)
-
-<<<<<<< HEAD
-=======
-class bmipage(tk.Frame):
-    def __init__(self, parent, root):
-        super().__init__(parent)
-        label = tk.Label(self, text="bmi")
-        label.pack(pady=10,padx=10)
-
->>>>>>> origin/master
 class userpage(tk.Frame):
     # user
     def __init__(self, parent, root):
@@ -177,7 +170,13 @@ class userpage(tk.Frame):
         label = tk.Label(self, text="user")
         label.pack(pady=10,padx=10)
 
-<<<<<<< HEAD
+class adminpage(tk.Frame):
+    # admin
+    def __init__(self, parent, root):
+        super().__init__(parent)
+        label = tk.Label(self, text="admin")
+        label.pack(pady=10,padx=10)
+
 class bmipage(tk.Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
@@ -194,8 +193,25 @@ class bmipage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
-=======
->>>>>>> origin/master
+class bestwepage(tk.Frame):
+    def __init__(self, parent, root):
+        super().__init__(parent)
+        labeltop = tk.Label(self, text='最佳體重計算(身高以公尺為單位)').grid(row='0',column='1',columnspan=3)
+        entry1 = tk.Entry(self, show=None)
+        label1 = tk.Label(self, text="身高:").grid(row='1',column='0',pady=20)
+        entry1.grid(row='1',column='1',columnspan=3,pady=20)
+
+        btnsub = tk.Button(self, text='確定',command=lambda: root.bestwe(entry1))
+        btncle = tk.Button(self, text='清除',command=partial(tf.entryclear,entry1))
+        btnsub.grid(row='2',column='1',sticky=tk.E,pady=20)
+        btncle.grid(row='2',column='2',sticky=tk.E,pady=20)
+
+class logpage(tk.Frame):
+    # admin
+    def __init__(self, parent, root):
+        super().__init__(parent)
+
+
 if __name__ == '__main__':
     app = Application()
     app.mainloop()
