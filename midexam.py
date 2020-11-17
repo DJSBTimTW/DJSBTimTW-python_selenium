@@ -1,7 +1,8 @@
-import sqlite3,csv,datetime
+import sqlite3,csv
 import tkinter as tk
 import tkfunction as tf
 from tkinter import ttk
+from datetime import datetime
 import tkinter.messagebox
 from functools import partial
 
@@ -13,6 +14,14 @@ try:
             role char(8)               not null,
             acc  char(8) primary key   not null,
             pwd  char(8)               not null
+        );
+    ''')
+    conn.execute('''
+        create table if not exists log
+        (
+            datetime DATETIME             not null,
+            acc  char(8)                  not null,
+            action  char(10)               not null
         );
     ''')
 except Exception as e:
@@ -37,7 +46,7 @@ except OSError as e:
     exit()
 
 class Application(tk.Tk):
-    global loginrole,loginacc
+    global loginrole,loginacc,showtree
     loginrole = "login"
     def __init__(self):
         super().__init__()
@@ -51,7 +60,7 @@ class Application(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (loginpage, adminpage, userpage, bmipage, bestwepage):
+        for F in (loginpage, adminpage, userpage, bmipage, bestwepage, logpage):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -68,7 +77,7 @@ class Application(tk.Tk):
             menubar = tk.Menu(self)
             menubar.add_command(label="1.BMI計算",command=lambda: self.showbmipage(0))
             menubar.add_command(label="2.最佳體重計算",command=lambda: self.showbestwepage(0))
-            menubar.add_command(label="3.觀看log",command=lambda: self.showlogpage(0))
+            menubar.add_command(label="3.觀看log",command=lambda: self.showlogpage(1))
             menubar.add_command(label="4.離開",command=lambda: self.acclogout(0))
             self.configure(menu=menubar)
         elif loginrole == "user":
@@ -77,6 +86,7 @@ class Application(tk.Tk):
             menubar.add_command(label="2.最佳體重計算",command=lambda: self.showbestwepage(0))
             menubar.add_command(label="3.離開",command=lambda: self.acclogout(0))
             self.configure(menu=menubar)
+
         # menubar = frame.menubar(self)
         # self.configure(menu=menubar)
 
@@ -93,7 +103,9 @@ class Application(tk.Tk):
             self.show_frame(adminpage)
             tf.entryclear(name)
             tf.entryclear(pwd)
-            print(loginacc)
+            dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+            print("{},{},{}".format(dt,loginacc,"登入"))
+            tf.loging(dt,loginacc,"登入")
         elif lre == "user":
             tkinter.messagebox.showinfo('提示','登入成功')
             loginacc = strname
@@ -101,7 +113,9 @@ class Application(tk.Tk):
             self.show_frame(userpage)
             tf.entryclear(name)
             tf.entryclear(pwd)
-            print(loginacc)
+            dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+            print("{},{},{}".format(dt,loginacc,"登入"))
+            tf.loging(dt,loginacc,"登入")
         elif lre == "accno":
             tkinter.messagebox.showerror('提示','帳號錯誤')
             tf.entryclear(name)
@@ -111,8 +125,10 @@ class Application(tk.Tk):
             tf.entryclear(pwd)
 
     def acclogout(self,n):
-        print("logout")
         global loginrole,loginacc
+        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        print("{},{},{}".format(dt,loginacc,"離開"))
+        tf.loging(dt,loginacc,"離開")
         loginrole = "login"
         loginacc = ""
         self.show_frame(loginpage)
@@ -140,12 +156,21 @@ class Application(tk.Tk):
 
     def showbmipage(self,n):
         self.show_frame(bmipage)
+        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        print("{},{},{}".format(dt,loginacc,"BMI計算"))
+        tf.loging(dt,loginacc,"BMI計算")
 
     def showbestwepage(self,n):
         self.show_frame(bestwepage)
+        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        print("{},{},{}".format(dt,loginacc,"最佳體重計算"))
+        tf.loging(dt,loginacc,"最佳體重計算")
 
     def showlogpage(self,n):
         self.show_frame(logpage)
+        dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        print("{},{},{}".format(dt,loginacc,"觀看log"))
+        tf.loging(dt,loginacc,"觀看log")
 
 class loginpage(tk.Frame):
     def __init__(self, parent, root):
@@ -167,15 +192,13 @@ class userpage(tk.Frame):
     # user
     def __init__(self, parent, root):
         super().__init__(parent)
-        label = tk.Label(self, text="user")
-        label.pack(pady=10,padx=10)
+
 
 class adminpage(tk.Frame):
     # admin
     def __init__(self, parent, root):
         super().__init__(parent)
-        label = tk.Label(self, text="admin")
-        label.pack(pady=10,padx=10)
+
 
 class bmipage(tk.Frame):
     def __init__(self, parent, root):
@@ -193,6 +216,8 @@ class bmipage(tk.Frame):
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
+
+
 class bestwepage(tk.Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
@@ -206,10 +231,29 @@ class bestwepage(tk.Frame):
         btnsub.grid(row='2',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='2',column='2',sticky=tk.E,pady=20)
 
+
 class logpage(tk.Frame):
     # admin
     def __init__(self, parent, root):
         super().__init__(parent)
+        conn = sqlite3.connect('9A517012.db')
+        tree = ttk.Treeview(self, columns=('d1', 'd2', 'd3'), show="headings")
+        ysb=tkinter.ttk.Scrollbar(self,orient="vertical",command=tree.yview())
+        tree.column('d1',width=60,anchor='center')
+        tree.heading('d1',text='時間')
+        tree.column('d2',width=60,anchor='center')
+        tree.heading('d2',text='帳號')
+        tree.column('d3',width=60,anchor='center')
+        tree.heading('d3',text='動作')
+        cursor = conn.execute("select * from log ORDER BY datetime DESC LIMIT 20;")
+        for r in cursor:
+            tree.insert("",tk.END, values=(r[0], r[1], r[2]))
+        conn.close()
+        ysb.configure(command=tree.yview)
+        tree.configure(yscrollcommand=ysb.set)
+        tree.grid()
+
+
 
 
 if __name__ == '__main__':
