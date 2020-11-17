@@ -19,8 +19,23 @@ def login(name,pwd):
     else:
         return "accno"
 
-
 def entryclear(e):
     e.delete(0,'end')
+
+def twoclear(e1,e2):
+    e1.delete(0,'end')
+    e2.delete(0,'end')
+
+# def loging(acc,action):
+
+def bmicount(height,weight):
+    height = float(height)
+    weight = float(weight)
+    bmi = (weight/(height*height))
+    return bmi
+
+def getentry(e):
+    o = str(e.get()).strip()
+    return o
 
 

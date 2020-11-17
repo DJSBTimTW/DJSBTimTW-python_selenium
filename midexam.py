@@ -37,6 +37,8 @@ except OSError as e:
     exit()
 
 class Application(tk.Tk):
+    global loginrole,loginacc
+    loginrole = "login"
     def __init__(self):
         super().__init__()
 
@@ -49,29 +51,57 @@ class Application(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (loginPage, adminpage, userpage, ):
+        for F in (loginpage, adminpage, userpage, bmipage):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-        self.show_frame(loginPage)
+        self.show_frame(loginpage)
 
 
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-        menubar = frame.menubar(self)
-        self.configure(menu=menubar)
+        if loginrole == "login":
+            menubar = tk.Menu(self)
+            self.configure(menu=menubar)
+        elif loginrole == "admin":
+            menubar = tk.Menu(self)
+            menubar.add_command(label="1.BMI計算",command=lambda: self.showbmipage(0))
+            menubar.add_command(label="2.最佳體重計算")
+            menubar.add_command(label="3.觀看log")
+            menubar.add_command(label="4.離開",command=lambda: self.acclogout(0))
+            self.configure(menu=menubar)
+        elif loginrole == "user":
+            menubar = tk.Menu(self)
+            menubar.add_command(label="1.BMI計算",command=lambda: self.showbmipage(0))
+            menubar.add_command(label="2.最佳體重計算")
+            menubar.add_command(label="3.離開",command=lambda: self.acclogout(0))
+            self.configure(menu=menubar)
+        # menubar = frame.menubar(self)
+        # self.configure(menu=menubar)
 
-    def login(self, name,pwd):
-        strname = name.get()
-        strpwd = pwd.get()
+
+    def acclogin(self, name,pwd):
+        global loginrole,loginacc
+        strname = tf.getentry(name)
+        strpwd = tf.getentry(pwd)
         lre = tf.login(strname,strpwd)
         if lre == "admin":
             tkinter.messagebox.showinfo('提示','登入成功')
+            loginacc = strname
+            loginrole = lre
             self.show_frame(adminpage)
+            tf.entryclear(name)
+            tf.entryclear(pwd)
+            print(loginacc)
         elif lre == "user":
             tkinter.messagebox.showinfo('提示','登入成功')
+            loginacc = strname
+            loginrole = lre
             self.show_frame(userpage)
+            tf.entryclear(name)
+            tf.entryclear(pwd)
+            print(loginacc)
         elif lre == "accno":
             tkinter.messagebox.showerror('提示','帳號錯誤')
             tf.entryclear(name)
@@ -80,30 +110,46 @@ class Application(tk.Tk):
             tkinter.messagebox.showerror('提示','密碼錯誤')
             tf.entryclear(pwd)
 
+    def acclogout(self,n):
+        print("logout")
+        global loginrole,loginacc
+        loginrole = "login"
+        loginacc = ""
+        self.show_frame(loginpage)
 
+    def bmicou(self,he,we):
+        hei = tf.getentry(he)
+        wei = tf.getentry(we)
+        if hei !="" or wei !="":
+            bmi = tf.bmicount(hei,wei)
+            tkinter.messagebox.showinfo('計算結果','BMI為:{}'.format(bmi))
+            tf.twoclear(he,we)
+        else:
+            tkinter.messagebox.showerror('提示','輸入錯誤')
+            tf.twoclear(he,we)
 
-class loginPage(tk.Frame):
-    '''主页'''
+    def showbmipage(self,n):
+        self.show_frame(bmipage)
+
+class loginpage(tk.Frame):
     def __init__(self, parent, root):
         super().__init__(parent)
         labeltop = tk.Label(self, text='登入').grid(row='0',column='1',columnspan=3)
         entry1 = tk.Entry(self, show=None)
         entry2 = tk.Entry(self, show='*')
         label1 = tk.Label(self, text="帳號:").grid(row='1',column='0',pady=20)
-        label2 = tk.Label(self, text="帳號:").grid(row='2',column='0',pady=20)
+        label2 = tk.Label(self, text="密碼:").grid(row='2',column='0',pady=20)
         entry1.grid(row='1',column='1',columnspan=3,pady=20)
         entry2.grid(row='2',column='1',columnspan=3,pady=20)
 
-        btnsub = tk.Button(self, text='確定',command=partial(root.login,entry1,entry2))
-        btncle = tk.Button(self, text='清除',command=partial(tf.entryclear,entry1,entry2))
+        btnsub = tk.Button(self, text='確定',command=partial(root.acclogin,entry1,entry2))
+        btncle = tk.Button(self, text='清除',command=partial(tf.twoclear,entry1,entry2))
         btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
         btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
     def menubar(salf, root):
         menubar = tk.Menu(root)
         return menubar
-
-
 
 class adminpage(tk.Frame):
     # admin
@@ -112,17 +158,6 @@ class adminpage(tk.Frame):
         label = tk.Label(self, text="admin")
         label.pack(pady=10,padx=10)
 
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        menubar.add_cascade(label="1.BMI計算")
-        menubar.add_cascade(label="2.最佳體重計算")
-        menubar.add_cascade(label="3.觀看log")
-        menubar.add_cascade(label="4.離開")
-        return menubar
-
-
-
-
 class userpage(tk.Frame):
     # user
     def __init__(self, parent, root):
@@ -130,14 +165,21 @@ class userpage(tk.Frame):
         label = tk.Label(self, text="user")
         label.pack(pady=10,padx=10)
 
-    def menubar(salf, root):
-        menubar = tk.Menu(root)
-        menubar.add_cascade(label="1.BMI計算")
-        menubar.add_cascade(label="2.最佳體重計算")
-        menubar.add_cascade(label="3.離開")
-        return menubar
+class bmipage(tk.Frame):
+    def __init__(self, parent, root):
+        super().__init__(parent)
+        labeltop = tk.Label(self, text='BMI計算(身高以公尺為單位)').grid(row='0',column='1',columnspan=3)
+        entry1 = tk.Entry(self, show=None)
+        entry2 = tk.Entry(self, show=None)
+        label1 = tk.Label(self, text="身高:").grid(row='1',column='0',pady=20)
+        label2 = tk.Label(self, text="體重:").grid(row='2',column='0',pady=20)
+        entry1.grid(row='1',column='1',columnspan=3,pady=20)
+        entry2.grid(row='2',column='1',columnspan=3,pady=20)
 
-
+        btnsub = tk.Button(self, text='確定',command=lambda: root.bmicou(entry1,entry2))
+        btncle = tk.Button(self, text='清除',command=partial(tf.twoclear,entry1,entry2))
+        btnsub.grid(row='3',column='1',sticky=tk.E,pady=20)
+        btncle.grid(row='3',column='2',sticky=tk.E,pady=20)
 
 if __name__ == '__main__':
     app = Application()
