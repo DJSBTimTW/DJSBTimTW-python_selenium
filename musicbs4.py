@@ -33,9 +33,9 @@ for line in lines:
         elv = soup.select_one("#container > div > section > div > div > div.song-block > div.param-block > div.difficulty > ul > li.extra > img").get("src")
         selv = str(elv).split("_")[2].split(".")[0]
         print(selv)
-        writer.writerow([name,arts,getbpm,sgen,sslv,snlv,shlv,selv])
+        writer.writerow([name,arts,getbpm,sgen,sslv,snlv,shlv,selv,"0"])
     except Exception as e:
         print("none")
-        writer.writerow([name,arts,getbpm,sgen,sslv,snlv,shlv,""])
+        writer.writerow([name,arts,getbpm,sgen,sslv,snlv,shlv,"","0"])
 f.close()
 txt.close()
