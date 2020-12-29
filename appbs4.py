@@ -42,20 +42,52 @@ writer.writerow([txtread[0].strip(),userdata["uid"],userdata["tScore"],userdata[
 f.close()
 testcsv.close()
 chrome.get("https://mypage.groovecoaster.jp/sp/json/music_list.php")
+time.sleep(0.5)
 pre = chrome.find_element_by_tag_name("pre").text
 data = json.loads(pre)
 pdata = pformat(data).split('[',1)[1].rsplit(']',1)[0]
 ndata = re.split(r'{|},',pdata)
 m = open('mdata.txt',mode='w',encoding='utf-8',newline='')
 for i in range(len(ndata)):
-    m.write(ndata[i])
+    newline = str(ndata[i].replace("'","").replace("}","").replace(" ",""))
+    if (newline!="\n")&(newline!=""):
+        newlines = newline.split(',')
+        for u in range(len(newlines)):
+            newdata = str(newlines[u])
+            m.write(newdata)
+        m.write("\n"+"\n")
 m.close
 rm = open('mdata.txt',mode='r',encoding='utf-8',newline='')
 nm = open('nmdata.txt',mode='w',encoding='utf-8',newline='')
 lines=rm.readlines()
 for line in lines:
     nline = line.replace("'","").replace(",","").strip()
-    nm.write(nline)
-    nm.write("\n")
-rm.close()
+    if str(nline.split(':',1)[0])=="music_id":
+        nm.write(nline.split(':',1)[1]+"\n")
+    # if str(nline.split(':',1)[0])=="music_id":
+    #     url=("https://mypage.groovecoaster.jp/sp/#/mc/"+str(nline.split(':',1)[1]))
+    #     chrome.get(url)
+    #     time.sleep(0.5)
+    #     soup = bs4.BeautifulSoup(chrome.page_source,'html.parser')
+    #     songname = soup.select_one("#view_area > div > div > div.bgMusicDetail.top > div > div.txtMusicDetail.name.ng-binding").text
+    #     nm.write(songname+"\n")
+    #     try:
+    #         arts = soup.select_one("#view_area > div > div > div.bgMusicDetail.top > div > div.txtMusicDetail.artist.ng-scope.ng-binding").text
+    #         nm.write(arts+"\n")
+    #         playcount = soup.select_one("#view_area > div > div > div.bgMusicDetail.top > div > div:nth-child(6)").text
+    #     except Exception as e:
+    #         playcount = soup.select_one("#view_area > div > div > div.bgMusicDetail.top > div > div:nth-child(4)").text
+    #         print("none arts")
+    #     nm.write("總遊玩次數："+playcount.split(':',1)[1]+"\n")
+    #     nm.write("\n")
 nm.close()
+rm.close()
+# npdata = open('nmdata.txt',mode='r',encoding='utf-8',newline='')
+# mpdata = open('mpdata.txt',mode='w',encoding='utf-8',newline='')
+# lines=npdata.readlines()
+# for line in lines:
+#     pline = re.sub(r'[\'{},\s]*',"",line)
+#     mpdata.write(pline)
+#     mpdata.write("\n")
+# npdata.close()
+# mpdata.close()
