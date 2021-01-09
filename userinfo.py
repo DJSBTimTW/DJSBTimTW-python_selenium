@@ -16,7 +16,7 @@ def getinfo(CID,PWR):
     userdata = {}
     user=["cid","uid","tScore","aScore","pMusic","rank","avatar","title","clear","noMiss","fullChain","perfect","s","ss","sss","trophy","tRank"]
     soup = bs4.BeautifulSoup(chrome.page_source,'html.parser')
-    playername = soup.select_one("#view_area > div.txtTopName.frnd.plyrNm.ng-scope.ng-binding").text.strip()
+    playername = soup.find("div",class_='txtTopName').text.strip()
     userdata[str(user[0])]=CID
     userdata[str(user[1])]=playername
     finddata = soup.find("div",class_='bgTopCenter').find_all("div",class_='icnTop')

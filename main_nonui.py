@@ -2,7 +2,7 @@ import musicbs4,appbs4,sqlcon,userinfo,os,platform,sys,time
 
 def screenclear():
     osver=platform.system()
-    if (osver=='Linux' and osver=='Darwin'):
+    if (osver=='Linux' or osver=='Darwin'):
         os.system("clear")
     elif osver=='Windows':
         os.system("cls")

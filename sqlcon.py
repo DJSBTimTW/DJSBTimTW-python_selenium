@@ -54,7 +54,7 @@ def songdata(songinfo):
     conn.commit()
     conn.close()
 
-def userinfo(userdata):
+def userinfodb():
     conn = sqlite3.connect('userdata.db')
     conn.execute('''
         create table if not exists info
@@ -78,10 +78,17 @@ def userinfo(userdata):
             tRank       text                 not null
         );
     ''')
+    conn.commit()
+    conn.close()
+
+def userinfo(userdata):
+    conn = sqlite3.connect('userdata.db')
+    userinfodb()
     # conn.execute("insert or replace into info(cid, uid, tScore, aScore, pMusic, rank, avatar, title, clear, noMiss, fullChain, perfect, s, ss, sss, trophy, tRank) select ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? where not exists(select 1 from info where cid=?);",(userdata["cid"],userdata["uid"],userdata["tScore"],userdata["aScore"],userdata["pMusic"],userdata["rank"],userdata["avatar"],userdata["title"],userdata["clear"],userdata["noMiss"],userdata["fullChain"],userdata["perfect"],userdata["s"],userdata["ss"],userdata["sss"],userdata["trophy"],userdata["tRank"],userdata["cid"]))
     conn.execute("insert or replace into info(cid, uid, tScore, aScore, pMusic, rank, avatar, title, clear, noMiss, fullChain, perfect, s, ss, sss, trophy, tRank) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",(userdata["cid"],userdata["uid"],userdata["tScore"],userdata["aScore"],userdata["pMusic"],userdata["rank"],userdata["avatar"],userdata["title"],userdata["clear"],userdata["noMiss"],userdata["fullChain"],userdata["perfect"],userdata["s"],userdata["ss"],userdata["sss"],userdata["trophy"],userdata["tRank"]))
     conn.commit()
     conn.close()
+
 
 def playdataget(CID,lv):
     conn = sqlite3.connect('userdata.db')
@@ -115,4 +122,17 @@ def playdataget(CID,lv):
     # print(all)
     # print(pl)
 
-
+def infocheck(cid):
+    conn = sqlite3.connect('userdata.db')
+    connobj = conn.cursor()
+    connobj.execute("select * from info where cid=?;",(cid, ))
+    data = connobj.fetchone()
+    if data is None:
+        return('not found')
+    elif data is not None:
+        connobj.execute("select * from info where cid=?;",(cid, ))
+        info = connobj.fetchone()
+        return(info)
+    else:
+        print('db error')
+        return('error')
