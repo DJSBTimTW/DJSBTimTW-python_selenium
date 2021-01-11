@@ -7,14 +7,14 @@ def playdb():
         (
                 cid          char(16)  not null,
                 name         text      not null,
-                spc          text                 not null,
-                sps          text                 not null,
-                npc          text                 not null,
-                nps          text                 not null,
-                hpc          text                 not null,
-                hps          text                 not null,
-                epc          text                 not null,
-                eps          text                 not null,
+                spc          INTEGER   not null,
+                sps          INTEGER   not null,
+                npc          INTEGER   not null,
+                nps          INTEGER   not null,
+                hpc          INTEGER   not null,
+                hps          INTEGER   not null,
+                epc          INTEGER   not null,
+                eps          INTEGER   not null,
                 primary key (cid,name)
         );
     ''')
@@ -37,15 +37,84 @@ def songdb():
                 arts         text                 not null,
                 bpm          text                 not null,
                 gen          text                 not null,
-                simple       text                 not null,
-                normal       text                 not null,
-                hard         text                 not null,
-                extra        text                 not null,
-                del          text                 not null
+                simple       INTEGER              not null,
+                normal       INTEGER              not null,
+                hard         INTEGER              not null,
+                extra        INTEGER              not null,
+                del          text              not null
         );
     ''')
     conn.commit()
     conn.close()
+
+def gendb():
+    conn = sqlite3.connect('userdata.db')
+    conn.execute('''
+        create table if not exists gen
+        (
+                gen          text     primary key not null,
+                gentext      text                 not null
+        );
+    ''')
+    conn.commit()
+    conn.close()
+    gendata()
+
+def gendata():
+    conn = sqlite3.connect('userdata.db')
+    gentext={'animepops':'動漫/流行','vocaloid':'VOCALOID','touhou':'東方','otogame':'音樂遊戲','game':'遊戲','variety':'綜藝娛樂','original':'原創'}
+    for key,value in gentext.items():
+        conn.execute("insert or replace into gen(gen, gentext) VALUES (?,?)",(key,value))
+        conn.commit()
+    conn.close()
+
+def selectmusic(musiccombo):
+    conn = sqlite3.connect('userdata.db')
+    conn = conn.cursor()
+    conn.execute("select name, arts, bpm, gen, simple, normal, hard, extra, del from songinfo where name=?",(musiccombo,))
+    data = conn.fetchone()
+    print(data)
+    return(data)
+    conn.close
+
+def upmusic(newdata):
+    conn = sqlite3.connect('userdata.db')
+    conn.execute("update songinfo set arts=?, bpm=?, gen=?, simple=?, normal=?, hard=?, extra=?, del=? where name=?",(newdata[1],newdata[2],newdata[3],newdata[4],newdata[5],newdata[6],newdata[7],newdata[8],newdata[0]))
+    conn.commit()
+    cn = conn.total_changes
+    if cn == 0:
+        return("error")
+    else:
+        return("OK")
+    conn.close
+
+def deletemusic(musiccombodata):
+    conn = sqlite3.connect('userdata.db')
+    conn.execute("delete from songinfo where name=?;",(musiccombodata,))
+    conn.commit()
+    connobj = conn.cursor()
+    connobj.execute("select * from songinfo where name=?;",(musiccombodata, ))
+    data = connobj.fetchone()
+    if data is None:
+        return('OK')
+    elif data is not None:
+        return('error')
+    conn.close()
+
+def selectmusic(musiccombodata):
+    conn = sqlite3.connect('userdata.db')
+    connobj = conn.cursor()
+    connobj.execute("select * from songinfo where name=?;",(musiccombodata,))
+    data = connobj.fetchone()
+    if data is None:
+        return('error')
+    elif data is not None:
+        connobj.execute("select * from songinfo where name=?;",(musiccombodata,))
+        info = connobj.fetchone()
+        return(info)
+    else:
+        print('db error')
+        return('error')
 
 def songdata(songinfo):
     conn = sqlite3.connect('userdata.db')
@@ -122,17 +191,96 @@ def playdataget(CID,lv):
     # print(all)
     # print(pl)
 
-def infocheck(cid):
+def deleteinfo(cid):
+    conn = sqlite3.connect('userdata.db')
+    conn.execute("delete from info where cid=?;",(cid, ))
+    conn.commit()
+    connobj = conn.cursor()
+    connobj.execute("select * from info where cid=?;",(cid, ))
+    data = connobj.fetchone()
+    if data is None:
+        return('OK')
+    elif data is not None:
+        return('error')
+    conn.close()
+
+def deletepld(cid):
+    conn = sqlite3.connect('userdata.db')
+    conn.execute("delete from playdata where cid=?;",(cid,))
+    conn.commit()
+    connobj = conn.cursor()
+    connobj.execute("select * from playdata where cid=?;",(cid, ))
+    data = connobj.fetchone()
+    if data is None:
+        return('OK')
+    elif data is not None:
+        return('error')
+    conn.close()
+
+def showinfo(cid):
     conn = sqlite3.connect('userdata.db')
     connobj = conn.cursor()
     connobj.execute("select * from info where cid=?;",(cid, ))
     data = connobj.fetchone()
     if data is None:
-        return('not found')
+        return('error')
     elif data is not None:
         connobj.execute("select * from info where cid=?;",(cid, ))
         info = connobj.fetchone()
         return(info)
+    else:
+        print('db error')
+        return('error')
+
+
+def selectplayinfo(cid,gen,lv):
+    lvint=int(lv)
+    conn = sqlite3.connect('userdata.db')
+    connobj = conn.cursor()
+    dataobj = conn.cursor()
+    connobj.execute("select * from songinfo where gen=?;",(gen, ))
+    data = connobj.fetchone()
+    infodata=[]
+    if data is None:
+        return('error')
+    elif data is not None:
+        connobj.execute("select * from songinfo where gen=?;",(gen, ))
+        info = connobj.fetchall()
+        for i in info:
+            # if ((i[4]==lv or i[5]==lv or i[6]==lv or i[7]==lv) and i[8]=='0'):
+            if ((i[4]==lvint or i[5]==lvint or i[6]==lvint or i[7]==lvint) and i[8]=='0'):
+                dataobj.execute("select * from playdata where cid=? and name=?;",(cid,i[0]))
+                playdata = dataobj.fetchone()
+                if playdata is not None:
+                    infodata.append(playdata[1])
+        return(infodata)
+    else:
+        print('db error')
+        return('error')
+
+def selectplaydata(cid,name):
+    conn = sqlite3.connect('userdata.db')
+    connobj = conn.cursor()
+    dataobj = conn.cursor()
+    connobj.execute("select * from playdata where cid=? and name=?;",(cid,name))
+    data = connobj.fetchone()
+    if data is None:
+        return('error')
+    elif data is not None:
+        dataobj.execute("select extra from songinfo where name=?;",(name, ))
+        exin = dataobj.fetchone()
+        connobj.execute("select * from playdata where cid=? and name=?;",(cid,name))
+        exinfo=str(exin).replace("(","").replace(")","").replace("'","").replace(",","").replace("\n","").strip()
+        info = connobj.fetchone()
+        infodata=[]
+        if exinfo=='0':
+            for i in info:
+                infodata.append(i)
+            del infodata[-1]
+            del infodata[-1]
+            return(infodata)
+        elif exinfo!='0':
+            return(info)
     else:
         print('db error')
         return('error')

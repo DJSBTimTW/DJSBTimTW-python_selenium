@@ -3,6 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from pprint import pprint
 import userinfo,sqlcon,appbs4
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 def getmusicurl():
     options = Options()
@@ -78,6 +81,21 @@ def getsongdata(url):
             sqlcon.songdata(songinfo)
     except Exception as e:
         print("none url")
+
+def getmusic():
+    getmusicurl()
+    getmusicbs4("0")
+
+def manualmusic(songinfo):
+    try:
+        sqlcon.songdb()
+        try:
+            sqlcon.songdata(songinfo)
+            return('OK')
+        except Exception as e:
+            return('daerror')
+    except Exception as e:
+        return('dberror')
 
 typein = str(input("n")).strip()
 if typein == "n":

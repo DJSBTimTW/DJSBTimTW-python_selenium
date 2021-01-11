@@ -13,17 +13,22 @@ def getinfo(CID,PWR):
     pwd.send_keys(PWR)
     pwd.submit()
     time.sleep(2)
-    userdata = {}
-    user=["cid","uid","tScore","aScore","pMusic","rank","avatar","title","clear","noMiss","fullChain","perfect","s","ss","sss","trophy","tRank"]
-    soup = bs4.BeautifulSoup(chrome.page_source,'html.parser')
-    playername = soup.find("div",class_='txtTopName').text.strip()
-    userdata[str(user[0])]=CID
-    userdata[str(user[1])]=playername
-    finddata = soup.find("div",class_='bgTopCenter').find_all("div",class_='icnTop')
-    u = 1
-    for i in range(len(finddata)):
-        u+=1
-        userdata[str(user[u])]=finddata[i].text.strip()
-    print(userdata)
-    sqlcon.userinfo(userdata)
-    chrome.quit()
+    if chrome.current_url=='https://mypage.groovecoaster.jp/sp/#/':
+        userdata = {}
+        user=["cid","uid","tScore","aScore","pMusic","rank","avatar","title","clear","noMiss","fullChain","perfect","s","ss","sss","trophy","tRank"]
+        soup = bs4.BeautifulSoup(chrome.page_source,'html.parser')
+        playername = soup.find("div",class_='txtTopName').text.strip()
+        userdata[str(user[0])]=CID
+        userdata[str(user[1])]=playername
+        finddata = soup.find("div",class_='bgTopCenter').find_all("div",class_='icnTop')
+        u = 1
+        for i in range(len(finddata)):
+            u+=1
+            userdata[str(user[u])]=finddata[i].text.strip()
+        print(userdata)
+        sqlcon.userinfo(userdata)
+        chrome.quit()
+        return('OK')
+    elif chrome.current_url!='https://mypage.groovecoaster.jp/sp/#/':
+        chrome.quit()
+        return('error')
