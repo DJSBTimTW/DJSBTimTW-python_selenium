@@ -220,6 +220,7 @@ def deletepld(cid):
 def showinfo(cid):
     conn = sqlite3.connect('userdata.db')
     connobj = conn.cursor()
+    dataobj = conn.cursor()
     connobj.execute("select * from info where cid=?;",(cid, ))
     data = connobj.fetchone()
     if data is None:
@@ -227,7 +228,17 @@ def showinfo(cid):
     elif data is not None:
         connobj.execute("select * from info where cid=?;",(cid, ))
         info = connobj.fetchone()
-        return(info)
+        dataobj.execute("select spc,npc,hpc,epc from playdata where cid=?;",(cid, ))
+        data = dataobj.fetchall()
+        count=0
+        for i in data:
+            for u in i:
+                count=count+u
+        infodata=[]
+        for i in info:
+            infodata.append(i)
+        infodata.append(count)
+        return(infodata)
     else:
         print('db error')
         return('error')

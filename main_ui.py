@@ -624,7 +624,9 @@ def showinfopage():
         if combodata!='':
             ren=sqlcon.showinfo(combodata)
             if ren!='error':
-                tk.messagebox.showinfo('資料獲取成功','ID:{}\n排名:{}\n領航員:{}\n稱號:{}'.format(ren[1],ren[5],ren[6],ren[7]))
+                count3=int(int(ren[17])/3)
+                countmon=count3*30
+                tk.messagebox.showinfo('資料獲取成功','ID:{}\n排名:{}\n領航員:{}\n稱號:{}\n總遊玩次數:{}次\n大約 {}道 約花費{}元'.format(ren[1],ren[5],ren[6],ren[7],ren[17],count3,countmon))
                 showpage()
                 # lbna_da = tk.Label(showinfopageF, text=ren[1],bg='black',fg='white').place(x=40,y=170,width=100, height=25)
                 # lbra_da = tk.Label(showinfopageF, text=ren[5],bg='black',fg='white').place(x=190,y=170,width=100, height=25)
