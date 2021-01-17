@@ -4,7 +4,7 @@ from tkinter import ttk,messagebox,StringVar
 from PIL import ImageTk, Image
 from functools import partial
 
-def showimage(root):
+def showimage(root): #顯示logo
     load = Image.open('gc2b.png')
     render = ImageTk.PhotoImage(load)
     img = tk.Label(root, image=render,bg='black',fg='white')
@@ -13,7 +13,7 @@ def showimage(root):
     verinfo = tk.Label(root, text='Ver:1.0',bg='black',fg='white')
     verinfo.place(x=5, y=380, width=40, height=21)
 
-def showmainpageF():
+def showmainpageF(): #顯示主頁面(初始)
     mainF.place(x=0, y=0, width=300, height=400)
     showimage(mainF)
     btn101 = tk.Button(mainF, text='顯示資料', command=lambda: showpage(),bg='black',fg='white')
@@ -25,13 +25,13 @@ def showmainpageF():
     btn104 = tk.Button(mainF, text='退出', command=lambda: Close(),bg='black',fg='white')
     btn104.place(x=75, y=325, width=150, height=25)
 
-def re_placeF(root):
+def re_placeF(root): #關頁面
     frames=['mainF','dataF','showF','userinfoF','playdataF','getmusicF','urlmusicF','manualmusicF','moddataF','modplaydataF','modmusicdataF','modmusicF','showpageF','showinfopageF','showmusicpageF','showplaypageF']
     for i in frames:
         if i!=root:
             eval(i+".place_forget()")
 
-def showmainpage():
+def showmainpage(): #顯示主頁面
     re_placeF('mainF')
     mainF.place(x=0, y=0, width=300, height=400)
     showimage(mainF)
@@ -44,7 +44,7 @@ def showmainpage():
     btn104 = tk.Button(mainF, text='退出', command=lambda: Close(),bg='black',fg='white')
     btn104.place(x=75, y=325, width=150, height=25)
 
-def showdatapage():
+def showdatapage(): #抓取資料頁面
     re_placeF('dataF')
     dataF.place(x=0, y=0, width=300, height=400)
     showimage(dataF)
@@ -57,7 +57,7 @@ def showdatapage():
     btn204 = tk.Button(dataF, text='返回至首頁', command=lambda: showmainpage(),bg='black',fg='white')
     btn204.place(x=75, y=325, width=150, height=25)
 
-def showuserinfopage():
+def showuserinfopage(): #抓取玩家資料
     re_placeF('userinfoF')
     userinfoF.place(x=0, y=0, width=300, height=400)
     showimage(userinfoF)
@@ -115,7 +115,7 @@ def showuserinfopage():
     btnback = tk.Button(userinfoF, text='返回', command=lambda: showdatapage(),bg='black',fg='white')
     btnback.place(x=155, y=330, width=100, height=25)
 
-def combo_values_input():
+def combo_values_input(): #已儲存的卡號
     conn = sqlite3.connect('userdata.db')
     cur = conn.cursor()
     query = cur.execute('select cid from info')
@@ -126,13 +126,13 @@ def combo_values_input():
     cur.close()
     conn.close()
 
-def combo_playinfo_input(playinfo):
+def combo_playinfo_input(playinfo): #玩家資料
     data = []
     for row in playinfo:
         data.append(row)
     return data
 
-def combo_gentext_input():
+def combo_gentext_input(): #分類轉換
     conn = sqlite3.connect('userdata.db')
     cur = conn.cursor()
     query = cur.execute('select gentext from gen')
@@ -143,7 +143,7 @@ def combo_gentext_input():
     cur.close()
     conn.close()
 
-def combo_gen_input(gentext):
+def combo_gen_input(gentext): #依分類選擇歌曲
     conn = sqlite3.connect('userdata.db')
     conr = conn.cursor()
     conr.execute('select gen from gen where gentext=?;',(gentext,))
@@ -160,7 +160,7 @@ def combo_gen_input(gentext):
     conr.close()
     conn.close()
 
-def showplaydatapage():
+def showplaydatapage(): #抓取玩家遊玩資料
     re_placeF('playdataF')
     playdataF.place(x=0, y=0, width=300, height=400)
     showimage(playdataF)
@@ -216,7 +216,7 @@ def showplaydatapage():
     btnback = tk.Button(playdataF, text='返回', command=lambda: showdatapage(),bg='black',fg='white')
     btnback.place(x=155, y=330, width=100, height=25)
 
-def showgetmusicpage():
+def showgetmusicpage(): #抓取歌曲資料頁面
     re_placeF('getmusicF')
     getmusicF.place(x=0, y=0, width=300, height=400)
     showimage(getmusicF)
@@ -229,19 +229,19 @@ def showgetmusicpage():
     btn304 = tk.Button(getmusicF, text='返回', command=lambda: showdatapage(),bg='black',fg='white')
     btn304.place(x=75, y=325, width=150, height=25)
 
-def getmusicdata():
+def getmusicdata(): #抓取全部歌曲資料(功能)
     tk.messagebox.showinfo('提示','即將開始抓取資料')
     musicbs4.getmusic()
     tk.messagebox.showinfo('提示','抓取資料結束')
     showdatapage()
 
-def getmusicurldata(ty):
+def getmusicurldata(ty): #URL抓取歌曲資料(功能)
     tk.messagebox.showinfo('提示','即將開始抓取資料')
     musicbs4.getmusicbs4(ty)
     tk.messagebox.showinfo('提示','抓取資料結束')
     showdatapage()
 
-def showurlmusicpage():
+def showurlmusicpage(): #輸入URL抓取歌曲資料(頁面)
     re_placeF('urlmusicF')
     urlmusicF.place(x=0, y=0, width=300, height=400)
     showimage(urlmusicF)
@@ -255,7 +255,7 @@ def showurlmusicpage():
     btnback = tk.Button(urlmusicF, text='返回', command=lambda: showgetmusicpage(),bg='black',fg='white')
     btnback.place(x=155, y=330, width=100, height=25)
 
-def manualmusicpage():
+def manualmusicpage(): #手動輸入歌曲資料
     re_placeF('manualmusicF')
     manualmusicF.place(x=0, y=0, width=300, height=400)
     showimage(manualmusicF)
@@ -330,7 +330,7 @@ def manualmusicpage():
     btnback = tk.Button(manualmusicF, text='返回', command=lambda: showdatapage(),bg='black',fg='white')
     btnback.place(x=155, y=350, width=100, height=25)
 
-def showmoddatapage():
+def showmoddatapage(): #修改資料(頁面)
     re_placeF('moddataF')
     moddataF.place(x=0, y=0, width=300, height=400)
     showimage(moddataF)
@@ -341,7 +341,7 @@ def showmoddatapage():
     btnback = tk.Button(moddataF, text='返回至首頁', command=lambda: showmainpage(),bg='black',fg='white')
     btnback.place(x=75, y=325, width=150, height=25)
 
-def modplaydatapage():
+def modplaydatapage(): #修改玩家資料
     re_placeF('modplaydataF')
     modplaydataF.place(x=0, y=0, width=300, height=400)
     showimage(modplaydataF)
@@ -399,36 +399,8 @@ def modplaydatapage():
     btnback = tk.Button(modplaydataF, text='返回', command=lambda: showmoddatapage(),bg='black',fg='white')
     btnback.place(x=75, y=325, width=150, height=25)
 
-def modmusicdatapage():
-    mainF.place_forget()
-
-    dataF.place_forget()
-
-    showF.place_forget()
-
-    userinfoF.place_forget()
-
-    playdataF.place_forget()
-
-    getmusicF.place_forget()
-
-    urlmusicF.place_forget()
-
-    manualmusicF.place_forget()
-
-    moddataF.place_forget()
-
-    modplaydataF.place_forget()
-
-    modmusicF.place_forget()
-
-    showpageF.place_forget()
-
-    showinfopageF.place_forget()
-
-    showmusicpageF.place_forget()
-
-    showplaypageF.place_forget()
+def modmusicdatapage(): #修改歌曲資料(選擇歌曲)
+    re_placeF('modmusicdataF')
     modmusicdataF.place(x=0, y=0, width=300, height=400)
     showimage(modmusicdataF)
 
@@ -480,36 +452,8 @@ def modmusicdatapage():
     btnback = tk.Button(modmusicdataF, text='返回', command=lambda: backpage(),bg='black',fg='white')
     btnback.place(x=155, y=350, width=100, height=25)
 
-def modmusic(musiccombo):
-    mainF.place_forget()
-
-    dataF.place_forget()
-
-    showF.place_forget()
-
-    userinfoF.place_forget()
-
-    playdataF.place_forget()
-
-    getmusicF.place_forget()
-
-    urlmusicF.place_forget()
-
-    manualmusicF.place_forget()
-
-    moddataF.place_forget()
-
-    modplaydataF.place_forget()
-
-    modmusicdataF.place_forget()
-
-    showpageF.place_forget()
-
-    showinfopageF.place_forget()
-
-    showmusicpageF.place_forget()
-
-    showplaypageF.place_forget()
+def modmusic(musiccombo): #修改歌曲資料
+    re_placeF('modmusicF')
     modmusicF.place(x=0, y=0, width=300, height=400)
     showimage(modmusicF)
     data = sqlcon.selectmusic(musiccombo)
@@ -589,7 +533,7 @@ def modmusic(musiccombo):
     btnback = tk.Button(modmusicF, text='返回', command=lambda: modmusicdatapage(),bg='black',fg='white')
     btnback.place(x=155, y=360, width=100, height=25)
 
-def showpage():
+def showpage(): #顯示資料(頁面)
     re_placeF('showpageF')
     showpageF.place(x=0, y=0, width=300, height=400)
     showimage(showpageF)
@@ -602,7 +546,7 @@ def showpage():
     btn104 = tk.Button(showpageF, text='返回至首頁', command=lambda: showmainpage(),bg='black',fg='white')
     btn104.place(x=75, y=325, width=150, height=25)
 
-def showinfopage():
+def showinfopage(): #顯示玩家資料
     re_placeF('showinfopageF')
     showinfopageF.place(x=0, y=0, width=300, height=400)
     showimage(showinfopageF)
@@ -640,7 +584,7 @@ def showinfopage():
     btnr = tk.Button(showinfopageF,text='確定', command=lambda: select_data(combo.get()),bg='black',fg='white').place(x=75, y=250, width=150, height=25)
     btnback = tk.Button(showinfopageF,text='返回', command=lambda: showpage(),bg='black',fg='white').place(x=75, y=325, width=150, height=25)
 
-def showmusicpage():
+def showmusicpage(): #顯示歌曲資料
     re_placeF('showmusicpageF')
     showmusicpageF.place(x=0, y=0, width=300, height=400)
     showimage(showmusicpageF)
@@ -698,7 +642,7 @@ def showmusicpage():
     btnback = tk.Button(showmusicpageF, text='返回', command=lambda: backpage(),bg='black',fg='white')
     btnback.place(x=155, y=350, width=100, height=25)
 
-def showplaypage():
+def showplaypage(): #顯示遊玩紀錄
     re_placeF('showplaypageF')
     showplaypageF.place(x=0, y=0, width=300, height=400)
     showimage(showplaypageF)
